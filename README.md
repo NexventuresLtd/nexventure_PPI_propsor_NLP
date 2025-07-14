@@ -3,7 +3,7 @@
 A natural language processing (NLP) project designed to extract **structured information** from procurement texts in Rwanda, using **Named Entity Recognition (NER)** and **Text Classification**.
 
 ---
-
+**Note**: this the MVP using sample dataset
 ## 📦 Repository
 
 **GitHub Repo:**  
