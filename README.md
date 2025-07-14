@@ -1,18 +1,18 @@
 # Umucyo NLP
 
-A natural language processing project designed for intelligent analysis of **procurement texts** using **Named Entity Recognition (NER)** and **Text Classification** models.
+A natural language processing (NLP) project designed to extract **structured information** from procurement texts in Rwanda, using **Named Entity Recognition (NER)** and **Text Classification**.
 
 ---
 
 ## 📦 Repository
 
-**GitHub Repo**:  
-`https://github.com/nexventures-ltd/nexventure_PPI_propsor_NLP`
+**GitHub Repo:**  
+➡️ https://github.com/nexventures-ltd/nexventure_PPI_propsor_NLP
 
-To clone:
+Clone it:
 
 ```bash
-git clone https://github.com/nexventures-ltd/nexventure_PPI_propsor_NLP
+git clone https://github.com/nexventures-ltd/nexventure_PPI_propsor_NLP.git
 cd nexventure_PPI_propsor_NLP
 ````
 
@@ -20,27 +20,27 @@ cd nexventure_PPI_propsor_NLP
 
 ## 📁 Project Structure
 
-```bash
-.
-├── app/                    # Core application logic
-│   ├── ner_model.py        # NER inference pipeline
-│   ├── classifier_model.py # Classification pipeline
-│   ├── parser.py           # Combines NER + classifier for final output
-│   └── sample_data.py      # Example texts to test pipeline
+```
+nexventure_PPI_propsor_NLP/
+├── app/                    # Core app logic
+│   ├── ner_model.py        # NER inference logic
+│   ├── classifier_model.py # Classification inference logic
+│   ├── parser.py           # Combines NER + classifier into unified output
+│   └── sample_data.py      # Example test texts
 │
-├── train/                  # Training scripts and datasets
-│   ├── fine_tune_ner.py    # Script to fine-tune NER model
-│   ├── fine_tune_cls.py    # Script to fine-tune classifier model
-│   ├── ner_dataset.json    # Dataset for NER (tokens + labels)
-│   ├── cls_dataset.json    # Dataset for classification (text + category)
-│   ├── create_data_set_ner.py   # Generates NER dataset (if missing)
-│   └── create_data_set_cls.py   # Generates classification dataset (if missing)
+├── train/                  # Training & dataset creation
+│   ├── fine_tune_ner.py          # Train NER model
+│   ├── fine_tune_cls.py          # Train classifier model
+│   ├── ner_dataset.json          # NER training data
+│   ├── cls_dataset.json          # Classification training data
+│   ├── create_data_set_ner.py    # Generates 10K+ NER training examples
+│   └── create_data_set_cls.py    # Generates 10K+ classification examples
 │
 ├── api/
-│   └── main.py             # FastAPI app for live API predictions
+│   └── main.py             # FastAPI server for inference
 │
-├── requirements.txt        # Python requirements (if using pip)
-└── README.md
+├── environment.yml         # Conda environment definition
+└── README.md               # This file
 ```
 
 ---
@@ -50,47 +50,43 @@ cd nexventure_PPI_propsor_NLP
 ### 1. 🐍 Create Conda Environment
 
 ```bash
-conda create -n umucyo_nlp python=3.10
+conda env create -f environment.yml
 conda activate umucyo_nlp
-```
-
-Then install dependencies:
-
-```bash
-# via conda
-conda install pytorch torchvision torchaudio -c pytorch
-conda install -c conda-forge transformers datasets fastapi uvicorn scikit-learn pandas tqdm
-
-# via pip
-pip install accelerate sentencepiece python-multipart
 ```
 
 ---
 
-### 2. 📊 Generate Dataset (if missing)
+### 2. 📊 Generate Training Datasets
 
-If your datasets (`ner_dataset.json`, `cls_dataset.json`) are missing or broken:
+Run both scripts to generate **NER** and **classification** datasets:
 
 ```bash
 python train/create_data_set_ner.py
 python train/create_data_set_cls.py
 ```
 
+This will generate `ner_dataset.json` and `cls_dataset.json` in the `train/` folder.
+
 ---
 
-### 3. 🧠 Train Models
+### 3. 🧠 Fine-Tune the Models
 
-You can fine-tune both NER and classifier models using:
+Train the **classification** model:
 
 ```bash
-# Train classification model
 python train/fine_tune_cls.py
+```
 
-# Train NER model
+Train the **NER** model:
+
+```bash
 python train/fine_tune_ner.py
 ```
 
-This will save models into `./models/cls` and `./models/ner`.
+The fine-tuned models will be saved in:
+
+* `models/cls/` for the classifier
+* `models/ner/` for NER
 
 ---
 
@@ -100,10 +96,7 @@ This will save models into `./models/cls` and `./models/ner`.
 uvicorn api.main:app --reload
 ```
 
-Access the API at:
-`http://127.0.0.1:8000`
-
-Test via:
+You can now send predictions via:
 
 ```bash
 curl -X POST "http://127.0.0.1:8000/predict" \
@@ -113,7 +106,7 @@ curl -X POST "http://127.0.0.1:8000/predict" \
 
 ---
 
-### 5. ✅ Example Output
+### ✅ Sample Output
 
 ```json
 {
@@ -134,30 +127,35 @@ curl -X POST "http://127.0.0.1:8000/predict" \
 
 ---
 
-## 🧠 Model Info
+## 🧠 Model Summary
 
-* Classification model: Fine-tuned `xlm-roberta-base` on procurement category texts (`technology`, `furniture`, `energy`, etc.)
-* NER model: Fine-tuned `xlm-roberta-base` to extract:
+* **Model architecture**: `xlm-roberta-base`
+* **Tasks**:
 
-  * `B-QUANTITY`, `B-BRAND`, `B-MODEL`, `B-TYPE`, etc.
+  * Classification: `technology`, `furniture`, `energy`, .
+  * NER labels: `B-QUANTITY`, `B-BRAND`, `B-MODEL`, `B-TYPE`, .
 
 ---
 
 ## 🛠 Troubleshooting
 
-* ❌ If your output shows `null` values → Re-check model paths or re-run training
-* ❌ Missing tokens/labels in output → Ensure your dataset matches the format
-* ✅ Use the `create_data_set_*.py` generators to bootstrap your training files
+* `null` values in output? → Make sure models are trained and saved under `models/`
+* Datasets missing? → Re-run:
+
+  ```bash
+  python train/create_data_set_ner.py
+  python train/create_data_set_cls.py
+  ```
 
 ---
 
-## 👥 Contributing
+## 📬 Contributing
 
-Pull requests are welcome. For major changes, please open an issue first to discuss what you'd like to change.
+Pull requests and suggestions are welcome. Please fork and submit a PR or open an issue for discussion.
 
 ---
 
 ## 📜 License
 
-MIT License. See [LICENSE](LICENSE) file for details.
+MIT License – feel free to use and modify.
 
